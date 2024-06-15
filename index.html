@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Northumbria Constabulary Police Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .login-container h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .login-container form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .login-container form input[type="text"],
+        .login-container form input[type="password"] {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .login-container form input[type="submit"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2980b9;
+            color: white;
+            cursor: pointer;
+        }
+        .login-container form input[type="submit"]:hover {
+            background-color: #1f6cb5;
+        }
+
+        .sidebar {
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            padding: 20px;
+            background-color: #2980b9;
+            color: white;
+            border-radius: 0 10px 10px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .sidebar input[type="text"] {
+            width: calc(100% - 90px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        .sidebar button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            width: calc(100% - 40px);
+            background-color: #1f6cb5;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .sidebar button:hover {
+            background-color: #155d9e;
+        }
+        .tiles-container {
+            padding: 20px;
+            margin-left: 250px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .tile {
+            width: 250px;
+            margin: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+        .tile h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.5rem;
+        }
+        .tile .buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .tile .button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            background-color: #1f6cb5;
+            color: white;
+            transition: background-color 0.3s ease;
+            flex-grow: 1;
+            box-sizing: border-box;
+            max-width: 100px;
+        }
+        .tile .button:hover {
+            background-color: #155d9e;
+        }
+        .tile .button.red {
+            background-color: #e74c3c;
+        }
+        .tile .button.green {
+            background-color: #2ecc71;
+        }
+        .tile .notes textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <h2>Northumbria Constabulary Police Login</h2>
+        <form id="loginForm">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <h2>Add Callsign</h2>
+        <input type="text" id="callsignInput" placeholder="Callsign">
+        <button id="addCallsignBtn">Add</button>
+        <button id="logoutBtn">Logout</button>
+        <div id="callsignList">
+            <!-- Callsigns will be dynamically added here -->
+        </div>
+    </div>
+
+    <div id="tilesContainer" class="tiles-container">
+        <!-- Tiles will be dynamically added here -->
+    </div>
+
+    <script>
+        let callsigns = []; // Array to store callsigns
+
+        // Function to create a new tile
+        function createTile(callsign) {
+            // Create tile element
+            let tile = document.createElement('div');
+            tile.classList.add('tile');
+            
+            // Tile content
+            tile.innerHTML = `
+                <h2>${callsign}</h2>
+                <div class="buttons">
+                    <button class="button red">1</button>
+                    <button class="button red">2</button>
+                    <button class="button red">3</button>
+                    <button class="button red">4</button>
+                    <button class="button red">5</button>
+                    <button class="button red">6</button>
+                    <button class="button red">7</button>
+                    <button class="button red">8</button>
+                    <button class="button red">9</button>
+                    <button class="button red">10</button>
+                    <button class="button red">11</button>
+                    <button class="button red">12</button>
+                </div>
+                <div class="notes">
+                    <textarea rows="4" placeholder="Notes"></textarea>
+                </div>
+                <button class="deleteBtn">Delete</button>
+            `;
+            
+            // Append tile to tilesContainer
+            document.getElementById('tilesContainer').appendChild(tile);
+            
+            // Add event listeners to buttons inside the tile
+            let buttons = tile.querySelectorAll('.button');
+            buttons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    buttons.forEach(function(btn) {
+                        btn.classList.remove('green');
+                        btn.classList.add('red');
+                    });
+                    this.classList.remove('red');
+                    this.classList.add('green');
+                });
+            });
+            
+            // Add event listener to delete button
+            let deleteBtn = tile.querySelector('.deleteBtn');
+            deleteBtn.addEventListener('click', function() {
+                tile.remove();
+            });
+        }
+
+        // Add callsign button click event
+        document.getElementById('addCallsignBtn').addEventListener('click', function() {
+            let callsign = document.getElementById('callsignInput').value.trim();
+            if (callsign !== '') {
+                callsigns.push(callsign);
+                updateCallsignList();
+                createTile(callsign);
+                document.getElementById('callsignInput').value = '';
+            }
+        });
+
+        // Logout button click event
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            // Reset everything to initial state
+            callsigns = [];
+            document.getElementById('callsignList').innerHTML = '';
+            document.getElementById('tilesContainer').innerHTML = '';
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'flex';
+        });
+
+        // Function to update callsign list in the sidebar
+        function updateCallsignList() {
+            let callsignListDiv = document.getElementById('callsignList');
+            callsignListDiv.innerHTML = ''; // Clear previous list
+            
+            callsigns.forEach(function(callsign) {
+                let callsignItem = document.createElement('div');
+                callsignItem.classList.add('callsign-item');
+                callsignItem.textContent = callsign;
+                callsignListDiv.appendChild(callsignItem);
+            });
+        }
+
+        // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var username = this.username.value;
+            var password = this.password.value;
+            if ((username === 'Admin' || username === 'Control' || username === 'Supervisor') && password === 'NorthPolice123') {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'block';
+            } else {
+                alert('Invalid username or password!');
+            }
+        });
+
+        // Initial hide of sidebar
+        document.getElementById('sidebar').style.display = 'none';
+    </script>
+</body>
+</html>
